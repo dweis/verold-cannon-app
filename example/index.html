@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cannon Scene Demo</title>
+  <style>
+  body {
+    margin: 0 auto;
+    padding: 0;
+  }
+  #container {
+    width: 100%;
+    height: 100%;
+  }
+  body, html, canvas {
+    width:100%;
+    height:100%;
+  }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  <script type="text/javascript" src="http://assets.verold.com/verold_api/verold_api_v1.unstable.js"></script>
+  <script type="text/javascript">
+  var extensions = [
+  ];
+  VAPI.initialize([], function() {
+    require([ '../src/cannon_app.js' ], function(CannonApp) {
+      var TestApp = CannonApp.extend({
+        defaultSceneLoaded: function (scene) {
+          var models = scene.getAllObjects({ 'filter': { 'model': true } }),
+              lookAt;
+
+          this.model = models[Object.keys(models)[0]];
+
+          this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000);
+          this.camera.up.set(0, 1, 0);
+          this.camera.position.set(0, 0.5, 2);
+
+          lookAt = new THREE.Vector3();
+          lookAt.add(this.model.threeData.center);
+          lookAt.multiply(this.model.threeData.scale);
+          lookAt.applyQuaternion(this.model.threeData.quaternion);
+          lookAt.add(this.model.threeData.position);
+
+          this.camera.lookAt(lookAt);
+
+          this.veroldEngine.setActiveCamera(this.camera);
+        }
+      });
+
+      var testApp = new TestApp({
+        projectId: '51252a7a7806540200000009',
+        el: '#container'  
+      });
+
+      testApp.run();
+    });
+});
+</script>
+</body>
+</html>
