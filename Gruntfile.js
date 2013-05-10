@@ -36,7 +36,7 @@ module.exports = function(grunt) {
     regarde: {
       js: {
         files: [ 'src/**/*.js' ],
-        tasks: [ 'jshint', 'livereload' ]
+        tasks: [ 'livereload' ]
       }
     }
   });

@@ -6,6 +6,7 @@
   body {
     margin: 0 auto;
     padding: 0;
+    overflow: hidden;
   }
   #container {
     width: 100%;
@@ -24,7 +25,18 @@
   var extensions = [
   ];
   VAPI.initialize([], function() {
-    require([ '../src/cannon_app.js' ], function(CannonApp) {
+    requirejs.config({
+      baseUrl: '..',
+      paths: {
+        cannon: 'vendor/cannon'
+      },
+      shim: {
+        cannon: {
+          exports: 'CANNON'
+        }
+      }
+    });
+    require([ 'src/cannon_app' ], function(CannonApp) {
       var TestApp = CannonApp.extend({
         defaultSceneLoaded: function (scene) {
           var models = scene.getAllObjects({ 'filter': { 'model': true } }),
@@ -49,8 +61,8 @@
       });
 
       var testApp = new TestApp({
-        projectId: '51252a7a7806540200000009',
-        el: '#container'  
+        projectId: '51892bd08c133302000003be',
+        el: '#container'
       });
 
       testApp.run();
