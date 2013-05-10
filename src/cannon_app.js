@@ -19,10 +19,46 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-var VAPI = window.VAPI || {};
-define([], function() {
-  var CannonApp = VAPI.VeroldApp.extend({
 
+define([ 'box_mesh' ], function(BoxMesh) {
+  if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
+    throw new Error('VAPI.VeroldApp does not exist!');
+  }
+
+  var VAPI = window.VAPI;
+
+  var CannonApp = VAPI.VeroldApp.extend({
+    hengineReady: function() {
+      var that = this;
+
+      this.loadScene(this.defaultSceneID, {
+        success_hierarchy: function(scene) {
+          that.initializeCannon();
+          that.defaultSceneLoaded(scene);
+
+          that.defaultScene = scene;
+
+          that.on('update', that.update, that);
+          that.on('fixedUpdate', that.fixedUpdate, that);
+        },
+
+        progress: function(sceneObj) {
+          that.defaultSceneProgress(sceneObj);
+        }
+      });
+    },
+
+    initializeCannon: function() {
+
+    },
+
+    fixedUpdate: function(/*delta*/) {
+
+    },
+
+    update: function(/*delta*/) {
+
+    }
   });
 
   return CannonApp;
