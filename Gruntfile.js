@@ -9,7 +9,6 @@ module.exports = function(grunt) {
       }
     },
 
-
     requirejs: {
       compile: {
         options: {

@@ -1,6 +1,4 @@
 /*
-The MIT License (MIT)
-
 Copyright (c) 2013 Verold Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,7 +22,7 @@ THE SOFTWARE.
 var VAPI = window.VAPI || {};
 define([], function() {
   var CannonApp = VAPI.VeroldApp.extend({
-    
+
   });
 
   return CannonApp;
