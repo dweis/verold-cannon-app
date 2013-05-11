@@ -46,13 +46,15 @@
 
           this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000);
           this.camera.up.set(0, 1, 0);
-          this.camera.position.set(0, 0.5, 2);
+          this.camera.position.set(0, 1.5, 1.5);
 
           lookAt = new THREE.Vector3();
+          /*
           lookAt.add(this.model.threeData.center);
           lookAt.multiply(this.model.threeData.scale);
           lookAt.applyQuaternion(this.model.threeData.quaternion);
           lookAt.add(this.model.threeData.position);
+          */
 
           this.camera.lookAt(lookAt);
 
@@ -61,7 +63,7 @@
       });
 
       var testApp = new TestApp({
-        projectId: '51892bd08c133302000003be',
+        projectId: '5125972f87bc8e0200000280',
         el: '#container'
       });
 

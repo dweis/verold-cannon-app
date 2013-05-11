@@ -10,34 +10,35 @@ define([ 'cannon' ], function(CANNON) {
     this.model = model;
     this.material = material;
 
-    this.position = opts.position || new CANNON.Vec3(0, 0, 0);
+    this.position = opts.position || { x: 0, y: 0, z: 0 };
     this.mass = opts.mass || 10;
-    this.dimensions = opts.dimenions || new CANNON.Vec3(0.25, 0.25, 0.25);
+    this.dimensions = opts.dimensions || { x: 0.25, y: 0.25, z: 0.25 };
     this.linearDamping = opts.linearDamping || 0.3;
     this.angularDamping = opts.angularDamping || 0.3;
   }
 
   BoxMesh.prototype = _.extend({}, {
     create: function() {
-      var shape = new CANNON.Box(this.dimensions),
+      var shape = new CANNON.Box(new CANNON.Vec3(this.dimensions.x, this.dimensions.y, this.dimensions.z)),
           body = new CANNON.RigidBody(this.mass, shape, this.material);
 
       body.linearDamping = this.linearDamping;
       body.angularDamping = this.angularDamping;
 
       body.position.set(this.position.x, this.position.y, this.position.z);
+
       body.linearDamping = 0.10;
       body.preStep = $.proxy(this.preStep, this);
       body.postStep = $.proxy(this.postStep, this);
 
       this.world.add(body);
 
-      this.body = body;
-
       body.quaternion.set(this.model.threeData.quaternion.x,
                           this.model.threeData.quaternion.y,
                           this.model.threeData.quaternion.z,
                           this.model.threeData.quaternion.w);
+
+      this.body = body;
 
       this.created();
     },
@@ -47,8 +48,6 @@ define([ 'cannon' ], function(CANNON) {
     postStep: function() {},
 
     update: function(delta) {
-      this.delta = delta;
-
       this.body.position.copy(this.model.threeData.position);
       this.body.quaternion.copy(this.model.threeData.quaternion);
     },

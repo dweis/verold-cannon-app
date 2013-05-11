@@ -83,8 +83,6 @@ define([ 'src/box_mesh', 'cannon' ], function(BoxMesh, CANNON) {
       this.groundBody = groundBody;
 
       // global console, ModelObject
-      console.log(this.world, this.groundBody);
-
       this.defaultScene.traverse(function(obj) {
         if (obj instanceof ModelObject) {
           obj.threeData.bBox.geometry.computeBoundingBox();
@@ -93,12 +91,8 @@ define([ 'src/box_mesh', 'cannon' ], function(BoxMesh, CANNON) {
           v.sub(obj.threeData.bBox.geometry.boundingBox.min);
           v.multiplyVectors(v, obj.threeData.scale);
 
-          console.log('Size: ', v);
-
-          var position = new CANNON.Vec3(),
-              dimensions = new CANNON.Vec3();
-          position.set(obj.threeData.position.x, obj.threeData.position.y, obj.threeData.position.z);
-          dimensions.set(v.x, v.y, v.z);
+          var position = { x: obj.threeData.position.x, y: obj.threeData.position.y, z: obj.threeData.position.z },
+              dimensions = {x: v.x/2, y: v.y/2, z: v.z/2 };
 
           var boxMesh = new BoxMesh(that.world, obj, that.defaultMaterial, {
             position: position,
