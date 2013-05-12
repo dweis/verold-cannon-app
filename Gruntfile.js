@@ -12,12 +12,21 @@ module.exports = function(grunt) {
     requirejs: {
       compile: {
         options: {
-          baseUrl: "src",
-          dir: "build",
+          baseUrl: './src',
+          dir: 'build',
 
           optimize: 'uglify2',
           optimizeCss: 'standard',
           inlineText: true,
+
+          paths: {
+            cannon: 'vendor/cannon'
+          },
+          shim: {
+            cannon: {
+              exports: 'CANNON'
+            }
+          },
 
           modules: [
             { name: 'cannon_app' }

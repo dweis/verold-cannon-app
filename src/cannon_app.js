@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-define([ 'src/box_mesh', 'cannon' ], function(BoxMesh, CANNON) {
+define([ 'box_mesh', 'cannon' ], function(BoxMesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
@@ -59,8 +59,7 @@ define([ 'src/box_mesh', 'cannon' ], function(BoxMesh, CANNON) {
     initializeCannon: function() {
       var that = this,
           groundBody,
-          groundShape,
-          q;
+          groundShape;
 
       this.world = new CANNON.World();
       this.world.gravity.set(0, -9.82, 0);
@@ -70,38 +69,24 @@ define([ 'src/box_mesh', 'cannon' ], function(BoxMesh, CANNON) {
       this.world.defaultContactMaterial.contactEquationRegularizationTime = 4;
 
       this.defaultMaterial = new CANNON.Material('default');
-      this.defaultContactMaterial = new CANNON.ContactMaterial(this.defaultMaterial, this.defaultMaterial, 0.5, 0.7);
+      this.defaultContactMaterial = new CANNON.ContactMaterial(this.defaultMaterial, this.defaultMaterial, 0.5, 0.8);
       this.world.addContactMaterial(this.defaultContactMaterial);
 
       groundShape = new CANNON.Plane();
       groundBody = new CANNON.RigidBody(0, groundShape, this.defaultMaterial);
       groundBody.position.set(0, 0, 0);
-      q = new CANNON.Quaternion();
-      q.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), 0.5 * Math.PI);
-      groundBody.quaternion.set(q.x, q.y, q.z, q.w);
+      groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), 0.5 * Math.PI);
+
       this.world.add(groundBody);
-      this.groundBody = groundBody;
 
-      // global console, ModelObject
+      // global ModelObject
       this.defaultScene.traverse(function(obj) {
+        var body;
+
         if (obj instanceof ModelObject) {
-          obj.threeData.bBox.geometry.computeBoundingBox();
-
-          var v =  obj.threeData.bBox.geometry.boundingBox.max.clone();
-          v.sub(obj.threeData.bBox.geometry.boundingBox.min);
-          v.multiplyVectors(v, obj.threeData.scale);
-
-          var position = { x: obj.threeData.position.x, y: obj.threeData.position.y, z: obj.threeData.position.z },
-              dimensions = {x: v.x/2, y: v.y/2, z: v.z/2 };
-
-          var boxMesh = new BoxMesh(that.world, obj, that.defaultMaterial, {
-            position: position,
-            dimensions: dimensions
-          });
-
-          boxMesh.create();
-
-          that.bodies.push(boxMesh);
+          body = new BoxMesh(that.world, obj, that.defaultMaterial);
+          body.create();
+          that.bodies.push(body);
         }
       });
     },

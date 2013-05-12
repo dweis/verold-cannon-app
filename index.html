@@ -26,7 +26,7 @@
   ];
   VAPI.initialize([], function() {
     requirejs.config({
-      baseUrl: '..',
+      baseUrl: '../src',
       paths: {
         cannon: 'vendor/cannon'
       },
@@ -36,7 +36,7 @@
         }
       }
     });
-    require([ 'src/cannon_app' ], function(CannonApp) {
+    require([ 'cannon_app' ], function(CannonApp) {
       var TestApp = CannonApp.extend({
         defaultSceneLoaded: function (scene) {
           var models = scene.getAllObjects({ 'filter': { 'model': true } }),
@@ -63,6 +63,7 @@
       });
 
       var testApp = new TestApp({
+//        projectId: '518d479746685202000002fc',
         projectId: '5125972f87bc8e0200000280',
         el: '#container'
       });

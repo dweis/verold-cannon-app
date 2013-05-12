@@ -1,33 +1,35 @@
-/* global THREE */
-define([ 'cannon' ], function(CANNON) {
+define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
+  if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
+    throw new Error('VAPI.VeroldApp does not exist!');
+  }
+
   var _ = require('underscore'),
       $ = require('jquery');
 
   function BoxMesh(world, model, material, opts) {
-    opts = opts || {};
-
-    this.world = world;
-    this.model = model;
-    this.material = material;
-
-    this.position = opts.position || { x: 0, y: 0, z: 0 };
-    this.mass = opts.mass || 10;
-    this.dimensions = opts.dimensions || { x: 0.25, y: 0.25, z: 0.25 };
-    this.linearDamping = opts.linearDamping || 0.3;
-    this.angularDamping = opts.angularDamping || 0.3;
+    Mesh.call(this, world, model, material, opts);
   }
 
   BoxMesh.prototype = _.extend({}, {
     create: function() {
-      var shape = new CANNON.Box(new CANNON.Vec3(this.dimensions.x, this.dimensions.y, this.dimensions.z)),
-          body = new CANNON.RigidBody(this.mass, shape, this.material);
+      var shape, body;
+
+      this.model.threeData.bBox.geometry.computeBoundingBox();
+      this.position = this.model.threeData.position.clone();
+
+      this.dimensions = this.model.threeData.bBox.geometry.boundingBox.max.clone();
+      this.dimensions.sub(this.model.threeData.bBox.geometry.boundingBox.min);
+      this.dimensions.multiplyVectors(this.dimensions, this.model.threeData.scale);
+      this.dimensions.multiplyScalar(0.5);
+
+      shape = new CANNON.Box(new CANNON.Vec3(this.dimensions.x, this.dimensions.y, this.dimensions.z));
+      body = new CANNON.RigidBody(this.mass, shape, this.material);
 
       body.linearDamping = this.linearDamping;
       body.angularDamping = this.angularDamping;
 
       body.position.set(this.position.x, this.position.y, this.position.z);
 
-      body.linearDamping = 0.10;
       body.preStep = $.proxy(this.preStep, this);
       body.postStep = $.proxy(this.postStep, this);
 
@@ -43,11 +45,7 @@ define([ 'cannon' ], function(CANNON) {
       this.created();
     },
 
-    preStep: function() {},
-
-    postStep: function() {},
-
-    update: function(delta) {
+    update: function() {
       this.body.position.copy(this.model.threeData.position);
       this.body.quaternion.copy(this.model.threeData.quaternion);
     },
