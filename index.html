@@ -27,7 +27,8 @@
     requirejs.config({
       baseUrl: '../src',
       paths: {
-        cannon: 'vendor/cannon'
+        cannon: 'vendor/cannon',
+        underscore: 'vendor/underscore'
       },
       shim: {
         cannon: {
@@ -58,11 +59,13 @@
           this.controls = new THREE.OrbitControls(this.camera, $(this.el).get(0));
           this.controls.userPanSpeed = 0.1;
 
+          /*
           scene.threeData.traverse(function(obj) {
             if (obj.isBB) {
               obj.visible = true;
             }
           });
+          */
         },
 
         update: function(delta) {
@@ -71,11 +74,8 @@
       });
 
       var testApp = new TestApp({
-        //projectId: '5190da4b9d51fb0200000210', // 6cube shape
-        //projectId: '5190d5079d51fb02000001e4', // boxes
-        //projectId: '518d479746685202000002fc', // dwarves
-        projectId: '5125972f87bc8e0200000280', // plinko
-        el: '#container'
+        el: '#container',
+        projectId: '518d479746685202000002fc'
       });
 
       testApp.run();

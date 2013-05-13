@@ -20,13 +20,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
+define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
-
-  var _ = require('underscore'),
-      $ = require('jquery');
 
   function BoxMesh(world, model, material, opts) {
     Mesh.call(this, world, model, material, opts);
@@ -34,7 +31,7 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
 
   BoxMesh.prototype = _.extend({}, Mesh.prototype, {
     create: function() {
-      var shape, body;
+      var that = this, shape, body;
 
       this.model.threeData.bBox.geometry.computeBoundingBox();
       this.position = this.model.threeData.position.clone();
@@ -52,8 +49,13 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
 
       body.position.set(this.position.x, this.position.y, this.position.z);
 
-      body.preStep = $.proxy(this.preStep, this);
-      body.postStep = $.proxy(this.postStep, this);
+      body.preStep = function() {
+        that.preStep();
+      };
+
+      body.postStep = function() {
+        that.postStep();
+      };
 
       this.world.add(body);
 

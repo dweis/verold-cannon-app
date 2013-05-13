@@ -21,13 +21,10 @@ THE SOFTWARE.
 */
 
 // global MeshObject, SkinnedMeshObject
-define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
+define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
-
-  var _ = require('underscore'),
-      $ = require('jquery');
 
   function CompoundMesh(world, model, material, opts) {
     Mesh.call(this, world, model, material, opts);
@@ -47,18 +44,17 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
 
         if (obj instanceof MeshObject || obj instanceof SkinnedMeshObject) {
           obj.threeData.geometry.computeBoundingBox();
-          console.log(obj.threeData.geometry.boundingBox);
 
           dimensions = obj.threeData.geometry.boundingBox.max.clone();
           dimensions.sub(obj.threeData.geometry.boundingBox.min);
+          dimensions.multiplyVectors(dimensions, obj.threeData.scale);
+          dimensions.multiplyVectors(dimensions, that.model.threeData.scale);
           dimensions.multiplyScalar(0.5);
 
           position = obj.threeData.geometry.boundingBox.min.clone();
-          position.add(dimensions);
-          console.log(position, dimensions);
-
+          position.multiplyVectors(position, obj.threeData.scale);
           position.multiplyVectors(position, that.model.threeData.scale);
-          dimensions.multiplyVectors(dimensions, that.model.threeData.scale);
+          position.add(dimensions);
 
           shape = new CANNON.Box(new CANNON.Vec3(dimensions.x, dimensions.y, dimensions.z));
 
@@ -83,13 +79,15 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
       body.linearDamping = this.linearDamping;
       body.angularDamping = this.angularDamping;
 
-      body.preStep = $.proxy(this.preStep, this);
-      body.postStep = $.proxy(this.postStep, this);
+      body.preStep = function() {
+        that.preStep();
+      };
+
+      body.postStep = function() {
+        that.postStep();
+      };
 
       this.world.add(body);
-
-      this.body = body;
-
 
       this.model.cannonData = body;
 
