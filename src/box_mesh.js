@@ -32,7 +32,7 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
     Mesh.call(this, world, model, material, opts);
   }
 
-  BoxMesh.prototype = _.extend({}, {
+  BoxMesh.prototype = _.extend({}, Mesh.prototype, {
     create: function() {
       var shape, body;
 
@@ -62,17 +62,9 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
                           this.model.threeData.quaternion.z,
                           this.model.threeData.quaternion.w);
 
-      this.body = body;
+      this.model.cannonData = body;
 
       this.created();
-    },
-
-    update: function() {
-      this.body.position.copy(this.model.threeData.position);
-      this.body.quaternion.copy(this.model.threeData.quaternion);
-    },
-
-    created: function() {
     }
   });
 

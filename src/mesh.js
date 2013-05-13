@@ -25,6 +25,10 @@ define([], function() {
     create: function() {
       throw new Error('Not implemented');
     },
+    update: function() {
+      this.model.cannonData.position.copy(this.model.threeData.position);
+      this.model.cannonData.quaternion.copy(this.model.threeData.quaternion);
+    },
     created: function() {},
     preStep: function() {},
     postStep: function() {}

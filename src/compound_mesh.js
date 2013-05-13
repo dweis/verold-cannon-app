@@ -33,7 +33,7 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
     Mesh.call(this, world, model, material, opts);
   }
 
-  CompoundMesh.prototype = _.extend({}, {
+  CompoundMesh.prototype = _.extend({}, Mesh.prototype, {
     create: function() {
       var that = this,
           body;
@@ -47,16 +47,18 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
 
         if (obj instanceof MeshObject || obj instanceof SkinnedMeshObject) {
           obj.threeData.geometry.computeBoundingBox();
+          console.log(obj.threeData.geometry.boundingBox);
 
           dimensions = obj.threeData.geometry.boundingBox.max.clone();
           dimensions.sub(obj.threeData.geometry.boundingBox.min);
           dimensions.multiplyScalar(0.5);
-          dimensions.multiplyVectors(dimensions, that.model.threeData.scale);
 
           position = obj.threeData.geometry.boundingBox.min.clone();
           position.add(dimensions);
+          console.log(position, dimensions);
 
           position.multiplyVectors(position, that.model.threeData.scale);
+          dimensions.multiplyVectors(dimensions, that.model.threeData.scale);
 
           shape = new CANNON.Box(new CANNON.Vec3(dimensions.x, dimensions.y, dimensions.z));
 
@@ -88,15 +90,10 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
 
       this.body = body;
 
+
+      this.model.cannonData = body;
+
       this.created();
-    },
-
-    update: function() {
-      this.body.position.copy(this.model.threeData.position);
-      this.body.quaternion.copy(this.model.threeData.quaternion);
-    },
-
-    created: function() {
     }
   });
 
