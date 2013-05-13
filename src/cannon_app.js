@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+// global ModelObject
 define([ 'box_mesh', 'compound_mesh', 'cannon' ], function(BoxMesh, CompoundMesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
@@ -79,7 +80,6 @@ define([ 'box_mesh', 'compound_mesh', 'cannon' ], function(BoxMesh, CompoundMesh
 
       this.world.add(groundBody);
 
-      // global ModelObject
       this.defaultScene.traverse(function(obj) {
         var meshes = 0;
         if (obj instanceof ModelObject) {
