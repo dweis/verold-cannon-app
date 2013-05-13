@@ -14,6 +14,8 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
     create: function() {
       var shape, body;
 
+      console.log('Creating box mesh...');
+
       this.model.threeData.bBox.geometry.computeBoundingBox();
       this.position = this.model.threeData.position.clone();
 

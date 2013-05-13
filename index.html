@@ -46,7 +46,7 @@
 
           this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000);
           this.camera.up.set(0, 1, 0);
-          this.camera.position.set(0, 1.5, 1.5);
+          this.camera.position.set(0, 0.1, 2);
 
           lookAt = new THREE.Vector3();
           /*
@@ -59,12 +59,19 @@
           this.camera.lookAt(lookAt);
 
           this.veroldEngine.setActiveCamera(this.camera);
+
+          scene.threeData.traverse(function(obj) {
+            if (obj.isBB) {
+              console.log('BOUNDING BOX');
+              obj.visible = true;
+            }
+          });
         }
       });
 
       var testApp = new TestApp({
-//        projectId: '518d479746685202000002fc',
-        projectId: '5125972f87bc8e0200000280',
+        projectId: '518d479746685202000002fc', // dwarves
+        //projectId: '5125972f87bc8e0200000280', // plinko
         el: '#container'
       });
 
