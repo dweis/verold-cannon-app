@@ -26,31 +26,26 @@
   <script type="text/javascript">
   var TestApp = VAPI.CannonApp.extend({
     defaultSceneLoaded: function (scene) {
-      var models = scene.getAllObjects({ 'filter': { 'model': true } }),
-          lookAt;
+      var models = scene.getAllObjects({ 'filter': { 'model': true } });
 
       this.model = models[Object.keys(models)[0]];
 
-      this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000);
+      this.camera = new THREE.PerspectiveCamera(70, this.getAspect(), 0.1, 10000);
       this.camera.up.set(0, 1, 0);
       this.camera.position.set(0, 0.1, 2);
 
-      lookAt = new THREE.Vector3();
-
-      this.camera.lookAt(lookAt);
+      this.camera.lookAt(new THREE.Vector3());
 
       this.veroldEngine.setActiveCamera(this.camera);
 
       this.controls = new THREE.OrbitControls(this.camera, this.getRenderer().domElement);
       this.controls.userPanSpeed = 0.1;
 
-      /*
       scene.threeData.traverse(function(obj) {
         if (obj.isBB) {
           obj.visible = true;
         }
       });
-      */
     },
 
     update: function(delta) {
@@ -60,7 +55,7 @@
 
   var testApp = new TestApp({
     el: '#container',
-    projectId: '518d479746685202000002fc'
+    projectId: '5192959bf97b0a02000001e7'
   });
 
   testApp.run();
