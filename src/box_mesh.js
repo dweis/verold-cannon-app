@@ -1,18 +1,37 @@
-define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
+/*
+Copyright (c) 2013 Verold Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
-
-  var _ = require('underscore'),
-      $ = require('jquery');
 
   function BoxMesh(world, model, material, opts) {
     Mesh.call(this, world, model, material, opts);
   }
 
-  BoxMesh.prototype = _.extend({}, {
+  BoxMesh.prototype = _.extend({}, Mesh.prototype, {
     create: function() {
-      var shape, body;
+      var that = this, shape, body;
 
       this.model.threeData.bBox.geometry.computeBoundingBox();
       this.position = this.model.threeData.position.clone();
@@ -30,8 +49,13 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
 
       body.position.set(this.position.x, this.position.y, this.position.z);
 
-      body.preStep = $.proxy(this.preStep, this);
-      body.postStep = $.proxy(this.postStep, this);
+      body.preStep = function() {
+        that.preStep();
+      };
+
+      body.postStep = function() {
+        that.postStep();
+      };
 
       this.world.add(body);
 
@@ -40,17 +64,9 @@ define([ 'mesh', 'cannon' ], function(Mesh, CANNON) {
                           this.model.threeData.quaternion.z,
                           this.model.threeData.quaternion.w);
 
-      this.body = body;
+      this.model.cannonData = body;
 
       this.created();
-    },
-
-    update: function() {
-      this.body.position.copy(this.model.threeData.position);
-      this.body.quaternion.copy(this.model.threeData.quaternion);
-    },
-
-    created: function() {
     }
   });
 

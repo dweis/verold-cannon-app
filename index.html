@@ -22,13 +22,13 @@
   <div id="container"></div>
   <script type="text/javascript" src="http://assets.verold.com/verold_api/verold_api_v1.unstable.js"></script>
   <script type="text/javascript">
-  var extensions = [
-  ];
-  VAPI.initialize([], function() {
+  var extensions = [ 'https://raw.github.com/mrdoob/three.js/dev/examples/js/controls/OrbitControls.js' ];
+  VAPI.initialize(extensions, function() {
     requirejs.config({
       baseUrl: '../src',
       paths: {
-        cannon: 'vendor/cannon'
+        cannon: 'vendor/cannon',
+        underscore: 'vendor/underscore'
       },
       shim: {
         cannon: {
@@ -37,6 +37,8 @@
       }
     });
     require([ 'cannon_app' ], function(CannonApp) {
+      var $ = require('jquery');
+
       var TestApp = CannonApp.extend({
         defaultSceneLoaded: function (scene) {
           var models = scene.getAllObjects({ 'filter': { 'model': true } }),
@@ -46,26 +48,34 @@
 
           this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000);
           this.camera.up.set(0, 1, 0);
-          this.camera.position.set(0, 1.5, 1.5);
+          this.camera.position.set(0, 0.1, 2);
 
           lookAt = new THREE.Vector3();
-          /*
-          lookAt.add(this.model.threeData.center);
-          lookAt.multiply(this.model.threeData.scale);
-          lookAt.applyQuaternion(this.model.threeData.quaternion);
-          lookAt.add(this.model.threeData.position);
-          */
 
           this.camera.lookAt(lookAt);
 
           this.veroldEngine.setActiveCamera(this.camera);
+
+          this.controls = new THREE.OrbitControls(this.camera, $(this.el).get(0));
+          this.controls.userPanSpeed = 0.1;
+
+          /*
+          scene.threeData.traverse(function(obj) {
+            if (obj.isBB) {
+              obj.visible = true;
+            }
+          });
+          */
+        },
+
+        update: function(delta) {
+          this.controls.update();
         }
       });
 
       var testApp = new TestApp({
-//        projectId: '518d479746685202000002fc',
-        projectId: '5125972f87bc8e0200000280',
-        el: '#container'
+        el: '#container',
+        projectId: '518d479746685202000002fc'
       });
 
       testApp.run();

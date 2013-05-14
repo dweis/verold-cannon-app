@@ -20,18 +20,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-define([ 'box_mesh', 'cannon' ], function(BoxMesh, CANNON) {
+// global ModelObject
+define([ 'underscore', 'box_mesh', 'compound_mesh', 'cannon' ],
+      function(_, BoxMesh, CompoundMesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
 
-  var VAPI = window.VAPI;
-
-  var _ = require('underscore');
-
-  var CannonApp = VAPI.VeroldApp.extend({
+  var CannonApp = window.VAPI.CannonApp = window.VAPI.VeroldApp.extend({
     constructor: function() {
-      VAPI.VeroldApp.prototype.constructor.apply(this, arguments);
+      window.VAPI.VeroldApp.prototype.constructor.apply(this, arguments);
 
       this.bodies = [];
     },
@@ -79,14 +77,19 @@ define([ 'box_mesh', 'cannon' ], function(BoxMesh, CANNON) {
 
       this.world.add(groundBody);
 
-      // global ModelObject
       this.defaultScene.traverse(function(obj) {
-        var body;
-
+        var meshes = 0;
         if (obj instanceof ModelObject) {
-          body = new BoxMesh(that.world, obj, that.defaultMaterial);
-          body.create();
-          that.bodies.push(body);
+          obj.traverse(function(innerObj) {
+            if (innerObj.entityModel.get('type') === 'mesh') {
+              meshes += 1;
+            }
+          });
+          if (meshes > 1) {
+            that.bodies.push(new CompoundMesh(that.world, obj, that.defaultMaterial));
+          } else {
+            that.bodies.push(new BoxMesh(that.world, obj, that.defaultMaterial));
+          }
         }
       });
     },
