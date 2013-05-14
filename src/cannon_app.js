@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// global ModelObject
+/* global ModelObject */
 define([ 'underscore', 'box_mesh', 'compound_mesh', 'cannon' ],
       function(_, BoxMesh, CompoundMesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {

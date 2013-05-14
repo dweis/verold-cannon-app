@@ -1,10 +1,11 @@
+/* global module */
 module.exports = function(grunt) {
   grunt.initConfig({
     connect: {
       server: {
         options: {
           port: 8000,
-          base: '.'
+          base: 'build'
         }
       }
     },
@@ -45,12 +46,16 @@ module.exports = function(grunt) {
       options: {
         jshintrc: '.jshintrc'
       },
-      source: [ 'src/**/*.js', 'index.html' ]
+      source: [ 'src/**/*.js', '!src/vendor/**/*.js' ]
     },
 
     regarde: {
-      js: {
+      build: {
         files: [ 'src/**/*.js' ],
+        tasks: [ 'default' ]
+      },
+      reload: {
+        files: [ 'build/**' ],
         tasks: [ 'livereload' ]
       }
     }
@@ -63,6 +68,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
 
   grunt.registerTask('default', [ 'jshint', 'requirejs' ]);
-  grunt.registerTask('watch',  [ 'livereload-start', 'regarde' ]);
-  grunt.registerTask('server', [ 'livereload-start', 'connect', 'regarde' ]);
+  grunt.registerTask('watch',  [ 'default', 'livereload-start', 'regarde' ]);
+  grunt.registerTask('server', [ 'default', 'livereload-start', 'connect', 'regarde' ]);
 };

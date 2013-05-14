@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-// global MeshObject, SkinnedMeshObject
+/* global MeshObject, SkinnedMeshObject */
 define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
