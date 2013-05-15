@@ -69,7 +69,9 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
 
       body = new CANNON.RigidBody(this.mass, compoundShape, this.material);
 
-      body.position.set(this.position.x, this.position.y, this.position.z);
+      body.position.set(this.model.threeData.position.x,
+                        this.model.threeData.position.y,
+                        this.model.threeData.position.z);
 
       body.quaternion.set(this.model.threeData.quaternion.x,
                           this.model.threeData.quaternion.y,
@@ -79,17 +81,10 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
       body.linearDamping = this.linearDamping;
       body.angularDamping = this.angularDamping;
 
-      body.preStep = function() {
-        that.preStep();
-      };
-
-      body.postStep = function() {
-        that.postStep();
-      };
-
       this.world.add(body);
 
       this.model.cannonData = body;
+      this.model.cannonAppData = this;
 
       this.created();
     }

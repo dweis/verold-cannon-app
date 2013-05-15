@@ -11,7 +11,7 @@ module.exports = function(grunt) {
     },
 
     requirejs: {
-      compile: {
+      minified: {
         options: {
           baseUrl: './src',
 
@@ -20,7 +20,34 @@ module.exports = function(grunt) {
           out: 'build/cannon_app.min.js',
 
           optimize: 'uglify2',
-          optimizeCss: 'standard',
+          inlineText: true,
+
+          paths: {
+            cannon: 'vendor/cannon',
+            underscore: 'vendor/underscore'
+          },
+
+          shim: {
+            cannon: {
+              exports: 'CANNON'
+            }
+          },
+
+          wrap: {
+            startFile: 'src/start.frag',
+            endFile: 'src/end.frag'
+          }
+        }
+      },
+      development: {
+        options: {
+          baseUrl: './src',
+
+          name: 'vendor/almond',
+          include: [ 'cannon_app' ],
+          out: 'build/cannon_app.js',
+
+          optimize: 'none',
           inlineText: true,
 
           paths: {

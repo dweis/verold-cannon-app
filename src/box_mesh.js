@@ -31,10 +31,9 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
 
   BoxMesh.prototype = _.extend({}, Mesh.prototype, {
     create: function() {
-      var that = this, shape, body;
+      var shape, body;
 
       this.model.threeData.bBox.geometry.computeBoundingBox();
-      this.position = this.model.threeData.position.clone();
 
       this.dimensions = this.model.threeData.bBox.geometry.boundingBox.max.clone();
       this.dimensions.sub(this.model.threeData.bBox.geometry.boundingBox.min);
@@ -47,22 +46,16 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
       body.linearDamping = this.linearDamping;
       body.angularDamping = this.angularDamping;
 
-      body.position.set(this.position.x, this.position.y, this.position.z);
-
-      body.preStep = function() {
-        that.preStep();
-      };
-
-      body.postStep = function() {
-        that.postStep();
-      };
-
-      this.world.add(body);
+      body.position.set(this.model.threeData.position.x,
+                        this.model.threeData.position.y,
+                        this.model.threeData.position.z);
 
       body.quaternion.set(this.model.threeData.quaternion.x,
                           this.model.threeData.quaternion.y,
                           this.model.threeData.quaternion.z,
                           this.model.threeData.quaternion.w);
+
+      this.world.add(body);
 
       this.model.cannonData = body;
 

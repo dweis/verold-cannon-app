@@ -32,7 +32,6 @@ define([ 'underscore' ], function(_) {
     this.model = model;
     this.material = material;
 
-    this.position = opts.position || this.position || { x: 0, y: 0, z: 0 };
     this.mass = opts.mass || this.mass || 10;
     this.dimensions = opts.dimensions || this.dimensions || { x: 0.25, y: 0.25, z: 0.25 };
     this.linearDamping = opts.linearDamping || this.linearDamping || 0.3;
@@ -51,11 +50,7 @@ define([ 'underscore' ], function(_) {
       this.model.cannonData.quaternion.copy(this.model.threeData.quaternion);
     },
 
-    created: function() {},
-
-    preStep: function() {},
-
-    postStep: function() {}
+    created: function() {}
   });
 
   return Mesh;
