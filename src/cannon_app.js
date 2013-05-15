@@ -59,20 +59,17 @@ define([ 'underscore', 'box_mesh', 'compound_mesh', 'cannon' ],
           groundBody,
           groundShape;
 
+      // TODO: make this stuff configurable
       this.world = new CANNON.World();
       this.world.gravity.set(0, -9.82, 0);
       this.world.broadphase = new CANNON.NaiveBroadphase();
-      this.world.solver.iterations = 3;
-      this.world.solver.tolerance = 0.0001;
-      this.world.solver.k = 1000;
-      this.world.solver.d = 3;
-      //world.solver.setSpookParams(k,world.solver.d);
-      //world.solver.setSpookParams(world.solver.k,d);
-      //this.world.defaultContactMaterial.contactEquationStiffness = 1e6;
-      //this.world.defaultContactMaterial.contactEquationRegularizationTime = 4;
+      this.world.solver.iterations = 7;
+      this.world.solver.tolerance = 0.1;
+      this.world.defaultContactMaterial.contactEquationStiffness = 1e9;
+      this.world.defaultContactMaterial.contactEquationRegularizationTime = 4;
 
       this.defaultMaterial = new CANNON.Material('default');
-      this.defaultContactMaterial = new CANNON.ContactMaterial(this.defaultMaterial, this.defaultMaterial, 0.5, 0.8);
+      this.defaultContactMaterial = new CANNON.ContactMaterial(this.defaultMaterial, this.defaultMaterial, 0.1, 0.1);
       this.world.addContactMaterial(this.defaultContactMaterial);
 
       groundShape = new CANNON.Plane();

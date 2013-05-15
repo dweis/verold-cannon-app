@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
+/* global console */
 define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
@@ -45,6 +46,8 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
 
       body.linearDamping = this.linearDamping;
       body.angularDamping = this.angularDamping;
+
+      console.log(body.linearDamping, body.angularDamping);
 
       body.position.set(this.model.threeData.position.x,
                         this.model.threeData.position.y,

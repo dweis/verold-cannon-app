@@ -32,10 +32,9 @@ define([ 'underscore' ], function(_) {
     this.model = model;
     this.material = material;
 
-    this.mass = opts.mass || this.mass || 10;
-    this.dimensions = opts.dimensions || this.dimensions || { x: 0.25, y: 0.25, z: 0.25 };
-    this.linearDamping = opts.linearDamping || this.linearDamping || 0.3;
-    this.angularDamping = opts.angularDamping || this.angularDamping || 0.3;
+    this.mass = opts.mass || this.mass || 1;
+    this.linearDamping = opts.linearDamping || this.linearDamping || 0.9;
+    this.angularDamping = opts.angularDamping || this.angularDamping || 0.9;
 
     this.create();
   }

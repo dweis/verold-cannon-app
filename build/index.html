@@ -40,61 +40,6 @@
       this.controls = new THREE.OrbitControls(this.camera, this.getRenderer().domElement);
       this.controls.userPanSpeed = 0.1;
 
-      this.character = scene.getObject('51929ac102ef7ba75f0022e7');
-
-      this.character.defaultOrientation = new CANNON.Quaternion();
-
-      this.character.cannonData.quaternion.copy(this.character.defaultOrientation)
-
-      this.character.cannonData.postStep = (function(character) {
-        return function() {
-          // Force player to stay in upright position
-          character.defaultOrientation.copy(character.cannonData.quaternion);
-          character.cannonData.quaternion.toEuler(tmpVec);
-          tmp.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), tmpVec.y);
-          character.cannonData.quaternion.mult(tmp);
-
-          // Force player to stay on ground
-          character.cannonData.position.y = 0.0;
-        }
-      })(this.character);
-
-      this.character.cannonData.preStep = (function(inputHandler, character) {
-        var keyCodes = inputHandler.keyCodes;
-        return function() {
-          var velocity, worldPoint;
-
-          if (inputHandler.keyState[keyCodes.upArrow] || inputHandler.keyState[keyCodes.W]) {
-            this.quaternion.toEuler(tmpVec);
-            tmp.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), tmpVec.y);
-            velocity = tmp.vmult(new CANNON.Vec3(0, 0, 1));
-            velocity.copy(this.velocity);
-          } else if (inputHandler.keyState[keyCodes.downArrow] || inputHandler.keyState[keyCodes.S]) {
-            this.quaternion.toEuler(tmpVec);
-            tmp.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), tmpVec.y);
-            velocity = tmp.vmult(new CANNON.Vec3(0, 0, -0.8));
-            velocity.copy(this.velocity);
-          } else {
-            this.velocity.set(0, 0, 0);
-          }
-
-          if (inputHandler.keyState[keyCodes.leftArrow] || inputHandler.keyState[keyCodes.A]) {
-            this.angularVelocity.y = 2;
-          } else if (inputHandler.keyState[keyCodes.rightArrow] || inputHandler.keyState[keyCodes.D]) {
-            this.angularVelocity.y = -2;
-          } else {
-            this.angularVelocity.set(0, 0, 0);
-          }
-
-          // Switch to walk animation if player has enough angular or linear velocity
-          if (this.angularVelocity.norm() > 0.5 || this.velocity.norm() > 0.5) {
-            //character.setAnimation('Walk');
-          } else {
-            //character.setAnimation('Idle');
-          }
-        }
-      })(this.getInputHandler(), this);
-
       scene.threeData.traverse(function(obj) {
         if (obj.isBB) {
           obj.visible = true;
@@ -109,7 +54,7 @@
 
   var testApp = new TestApp({
     el: '#render-target-container',
-    projectId: '5192959bf97b0a02000001e7',
+    projectId: '5190da4b9d51fb0200000210',
     engineOptions: {
       handleInput: true
     }
