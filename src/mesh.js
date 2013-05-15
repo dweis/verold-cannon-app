@@ -25,12 +25,11 @@ define([ 'underscore' ], function(_) {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
 
-  function Mesh(world, model, material, opts) {
+  function Mesh(world, model, opts) {
     opts = opts || {};
 
     this.world = world;
     this.model = model;
-    this.material = material;
 
     this.mass = opts.mass || this.mass || 1;
     this.linearDamping = opts.linearDamping || this.linearDamping || 0.9;

@@ -68,30 +68,18 @@ define([ 'underscore', 'box_mesh', 'compound_mesh', 'cannon' ],
       this.world.defaultContactMaterial.contactEquationStiffness = 1e9;
       this.world.defaultContactMaterial.contactEquationRegularizationTime = 4;
 
-      this.defaultMaterial = new CANNON.Material('default');
-      this.defaultContactMaterial = new CANNON.ContactMaterial(this.defaultMaterial, this.defaultMaterial, 0.1, 0.1);
-      this.world.addContactMaterial(this.defaultContactMaterial);
-
       groundShape = new CANNON.Plane();
-      groundBody = new CANNON.RigidBody(0, groundShape, this.defaultMaterial);
+      groundBody = new CANNON.RigidBody(0, groundShape);
       groundBody.position.set(0, 0, 0);
+
+      // Rotate plane, Verold Studio is Y up
       groundBody.quaternion.setFromAxisAngle(new CANNON.Vec3(-1, 0, 0), 0.5 * Math.PI);
 
       this.world.add(groundBody);
 
       this.defaultScene.traverse(function(obj) {
-        var meshes = 0;
         if (obj instanceof ModelObject) {
-          obj.traverse(function(innerObj) {
-            if (innerObj.entityModel.get('type') === 'mesh') {
-              meshes += 1;
-            }
-          });
-          if (meshes > 1) {
-            that.bodies.push(new CompoundMesh(that.world, obj, that.defaultMaterial));
-          } else {
-            that.bodies.push(new BoxMesh(that.world, obj, that.defaultMaterial));
-          }
+          return that.bodies.push(new CompoundMesh(that.world, obj));
         }
       });
     },

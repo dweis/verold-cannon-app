@@ -20,22 +20,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-/* global MeshObject, SkinnedMeshObject */
+/* global MeshObject, SkinnedMeshObject, THREE */
 define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
 
-  function CompoundMesh(world, model, material, opts) {
-    Mesh.call(this, world, model, material, opts);
+  function computeTransform(obj, state) {
+    if (!state) {
+      state = {
+        scale: new THREE.Vector3(1, 1, 1),
+        quaternion: new THREE.Quaternion(0, 0, 0, 1)
+      };
+    }
+
+    if (obj.parent) {
+      state = computeTransform(obj.parent, state);
+    }
+
+    state.scale.multiply(obj.scale);
+    state.quaternion.multiply(obj.quaternion);
+
+    return state;
+  }
+
+  function CompoundMesh(world, model, opts) {
+    Mesh.call(this, world, model, opts);
   }
 
   CompoundMesh.prototype = _.extend({}, Mesh.prototype, {
     create: function() {
-      var that = this,
-          body;
-
-      var compoundShape = new CANNON.Compound();
+      var body, compoundShape = new CANNON.Compound();
 
       this.position = this.model.threeData.position.clone();
 
@@ -43,17 +58,17 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
         var shape, dimensions, position;
 
         if (obj instanceof MeshObject || obj instanceof SkinnedMeshObject) {
+          var transform = computeTransform(obj.threeData);
+
           obj.threeData.geometry.computeBoundingBox();
 
           dimensions = obj.threeData.geometry.boundingBox.max.clone();
           dimensions.sub(obj.threeData.geometry.boundingBox.min);
-          dimensions.multiplyVectors(dimensions, obj.threeData.scale);
-          dimensions.multiplyVectors(dimensions, that.model.threeData.scale);
+          dimensions.multiply(transform.scale);
           dimensions.multiplyScalar(0.5);
 
           position = obj.threeData.geometry.boundingBox.min.clone();
-          position.multiplyVectors(position, obj.threeData.scale);
-          position.multiplyVectors(position, that.model.threeData.scale);
+          position.multiplyVectors(position, transform.scale);
           position.add(dimensions);
 
           shape = new CANNON.Box(new CANNON.Vec3(dimensions.x, dimensions.y, dimensions.z));
@@ -67,7 +82,7 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
         }
       });
 
-      body = new CANNON.RigidBody(this.mass, compoundShape, this.material);
+      body = new CANNON.RigidBody(this.mass, compoundShape);
 
       body.position.set(this.model.threeData.position.x,
                         this.model.threeData.position.y,

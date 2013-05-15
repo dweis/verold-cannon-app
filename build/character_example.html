@@ -42,6 +42,14 @@
 
       this.character = scene.getObject('51929ac102ef7ba75f0022e7');
 
+      this.character.animate = function (name) {
+        if (this.animation !== name) {
+          this.animation = name;
+          this.setAnimation(name);
+          this.playAnimation(true);
+        }
+      };
+
       this.character.defaultOrientation = new CANNON.Quaternion();
 
       this.character.cannonData.quaternion.copy(this.character.defaultOrientation)
@@ -49,9 +57,12 @@
       this.character.cannonData.postStep = (function(character) {
         return function() {
           // Force player to stay in upright position
-          character.defaultOrientation.copy(character.cannonData.quaternion);
           character.cannonData.quaternion.toEuler(tmpVec);
           tmp.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), tmpVec.y);
+          character.cannonData.quaternion.mult(tmp);
+
+          character.defaultOrientation.toEuler(tmpVec);
+          tmp.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), tmpVec.x);
           character.cannonData.quaternion.mult(tmp);
 
           // Force player to stay on ground
@@ -67,33 +78,38 @@
           if (inputHandler.keyState[keyCodes.upArrow] || inputHandler.keyState[keyCodes.W]) {
             this.quaternion.toEuler(tmpVec);
             tmp.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), tmpVec.y);
-            velocity = tmp.vmult(new CANNON.Vec3(0, 0, 1));
-            velocity.copy(this.velocity);
+            velocity = tmp.vmult(new CANNON.Vec3(0, 0, 5/60));
+            this.velocity.vadd(velocity, this.velocity);
+            //velocity.copy(this.velocity);
           } else if (inputHandler.keyState[keyCodes.downArrow] || inputHandler.keyState[keyCodes.S]) {
             this.quaternion.toEuler(tmpVec);
             tmp.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), tmpVec.y);
-            velocity = tmp.vmult(new CANNON.Vec3(0, 0, -0.8));
-            velocity.copy(this.velocity);
+            velocity = tmp.vmult(new CANNON.Vec3(0, 0, -3/60));
+            this.velocity.vadd(velocity, this.velocity);
+            //velocity.copy(this.velocity);
           } else {
             this.velocity.set(0, 0, 0);
           }
 
           if (inputHandler.keyState[keyCodes.leftArrow] || inputHandler.keyState[keyCodes.A]) {
-            this.angularVelocity.y = 2;
+            this.angularVelocity.set(0, 2, 0);
           } else if (inputHandler.keyState[keyCodes.rightArrow] || inputHandler.keyState[keyCodes.D]) {
-            this.angularVelocity.y = -2;
+            this.angularVelocity.set(0, -2, 0);
           } else {
             this.angularVelocity.set(0, 0, 0);
           }
 
           // Switch to walk animation if player has enough angular or linear velocity
-          if (this.angularVelocity.norm() > 0.5 || this.velocity.norm() > 0.5) {
-            //character.setAnimation('Walk');
+
+          if (this.angularVelocity.norm() > 2 || this.velocity.norm() > 2) {
+            character.animate('Run-M');
+          } else if (this.angularVelocity.norm() > 0.5 || this.velocity.norm() > 0.5) {
+            character.animate('Walk');
           } else {
-            //character.setAnimation('Idle');
+            character.animate('Idle-M');
           }
         }
-      })(this.getInputHandler(), this);
+      })(this.getInputHandler(), this.character);
 
       scene.threeData.traverse(function(obj) {
         if (obj.isBB) {

@@ -26,13 +26,14 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
 
-  function BoxMesh(world, model, material, opts) {
-    Mesh.call(this, world, model, material, opts);
+  function BoxMesh(world, model, opts) {
+    Mesh.call(this, world, model, opts);
   }
 
   BoxMesh.prototype = _.extend({}, Mesh.prototype, {
     create: function() {
       var shape, body;
+
 
       this.model.threeData.bBox.geometry.computeBoundingBox();
 
@@ -42,7 +43,7 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
       this.dimensions.multiplyScalar(0.5);
 
       shape = new CANNON.Box(new CANNON.Vec3(this.dimensions.x, this.dimensions.y, this.dimensions.z));
-      body = new CANNON.RigidBody(this.mass, shape, this.material);
+      body = new CANNON.RigidBody(this.mass, shape);
 
       body.linearDamping = this.linearDamping;
       body.angularDamping = this.angularDamping;
@@ -61,6 +62,7 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
       this.world.add(body);
 
       this.model.cannonData = body;
+      this.model.cannonAppData = this;
 
       this.created();
     }
