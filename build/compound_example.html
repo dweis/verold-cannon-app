@@ -35,7 +35,7 @@
       this.veroldEngine.setActiveCamera(this.camera);
 
       this.controls = new THREE.OrbitControls(this.camera, this.getRenderer().domElement);
-      this.controls.userPanSpeed = 0.1;
+      this.controls.userPanSpeed = 0.01;
 
       scene.threeData.traverse(function(obj) {
         if (obj.isBB) {
@@ -45,6 +45,8 @@
     },
 
     update: function(delta) {
+      window.VAPI.CannonApp.prototype.update.call(this, delta);
+
       this.controls.update();
     }
   });

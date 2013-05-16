@@ -26,22 +26,18 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
 
-  function computeTransform(obj, state) {
-    if (!state) {
-      state = {
-        scale: new THREE.Vector3(1, 1, 1),
-        quaternion: new THREE.Quaternion(0, 0, 0, 1)
-      };
+  function computeScale(obj, scale) {
+    if (!scale) {
+      scale = new THREE.Vector3(1, 1, 1);
     }
 
     if (obj.parent) {
-      state = computeTransform(obj.parent, state);
+      scale = computeScale(obj.parent, scale);
     }
 
-    state.scale.multiply(obj.scale);
-    state.quaternion.multiply(obj.quaternion);
+    scale.multiply(obj.scale);
 
-    return state;
+    return scale;
   }
 
   function CompoundMesh(world, model, opts) {
@@ -52,33 +48,35 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
     create: function() {
       var body, compoundShape = new CANNON.Compound();
 
-      this.position = this.model.threeData.position.clone();
-
       this.model.traverse(function(obj) {
-        var shape, dimensions, position;
+        var shape, halfExtents, position, scale;
 
         if (obj instanceof MeshObject || obj instanceof SkinnedMeshObject) {
-          var transform = computeTransform(obj.threeData);
+          scale = computeScale(obj.threeData);
 
           obj.threeData.geometry.computeBoundingBox();
 
-          dimensions = obj.threeData.geometry.boundingBox.max.clone();
-          dimensions.sub(obj.threeData.geometry.boundingBox.min);
-          dimensions.multiply(transform.scale);
-          dimensions.multiplyScalar(0.5);
+          halfExtents = obj.threeData.geometry.boundingBox.max.clone();
+          halfExtents.sub(obj.threeData.geometry.boundingBox.min);
+          halfExtents.multiplyScalar(0.5);
 
-          position = obj.threeData.geometry.boundingBox.min.clone();
-          position.multiplyVectors(position, transform.scale);
-          position.add(dimensions);
+          position = new THREE.Vector3();
+          position.add(obj.threeData.parent.position.clone().multiply(obj.threeData.parent.scale));
+          position.add(obj.threeData.position.clone().multiply(obj.threeData.scale));
+          position.add(obj.threeData.geometry.boundingBox.min);
+          position.add(halfExtents);
 
-          shape = new CANNON.Box(new CANNON.Vec3(dimensions.x, dimensions.y, dimensions.z));
+          position.multiply(scale);
+          halfExtents.multiply(scale);
+
+          shape = new CANNON.Box(new CANNON.Vec3(halfExtents.x, halfExtents.y, halfExtents.z));
 
           compoundShape.addChild(shape,
-              new CANNON.Vec3(position.x, position.y, position.z),
-              new CANNON.Quaternion(obj.threeData.quaternion.x,
-                                    obj.threeData.quaternion.y,
-                                    obj.threeData.quaternion.z,
-                                    obj.threeData.quaternion.w));
+            new CANNON.Vec3(position.x, position.y, position.z),
+            new CANNON.Quaternion(obj.threeData.quaternion.x,
+                                  obj.threeData.quaternion.y,
+                                  obj.threeData.quaternion.z,
+                                  obj.threeData.quaternion.w));
         }
       });
 
