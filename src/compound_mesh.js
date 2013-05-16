@@ -61,7 +61,11 @@ define([ 'underscore', 'mesh', 'cannon' ], function(_, Mesh, CANNON) {
           halfExtents.multiplyScalar(0.5);
 
           position = new THREE.Vector3();
-          position.add(obj.threeData.parent.position.clone().multiply(obj.threeData.parent.scale));
+
+          if (obj.threeData.parent) {
+            position.add(obj.threeData.parent.position.clone().multiply(obj.threeData.parent.scale));
+          }
+
           position.add(obj.threeData.position.clone().multiply(obj.threeData.scale));
           position.add(obj.threeData.geometry.boundingBox.min);
           position.add(halfExtents);

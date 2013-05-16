@@ -21,8 +21,8 @@ THE SOFTWARE.
 */
 
 /* global ModelObject */
-define([ 'underscore', 'box_mesh', 'compound_mesh', 'cannon' ],
-      function(_, BoxMesh, CompoundMesh, CANNON) {
+define([ 'underscore', 'compound_mesh', 'cannon' ],
+      function(_, CompoundMesh, CANNON) {
   if (typeof window.VAPI === 'undefined' || typeof window.VAPI.VeroldApp === 'undefined') {
     throw new Error('VAPI.VeroldApp does not exist!');
   }
@@ -79,7 +79,7 @@ define([ 'underscore', 'box_mesh', 'compound_mesh', 'cannon' ],
 
       this.defaultScene.traverse(function(obj) {
         if (obj instanceof ModelObject) {
-          return that.bodies.push(new CompoundMesh(that.world, obj));
+          that.addBody(obj);
         }
       });
     },
@@ -94,6 +94,10 @@ define([ 'underscore', 'box_mesh', 'compound_mesh', 'cannon' ],
 
     update: function(/*delta*/) {
 
+    },
+
+    addBody: function(obj) {
+      this.bodies.push(new CompoundMesh(this.world, obj));
     }
   });
 
