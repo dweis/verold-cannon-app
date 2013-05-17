@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cannon Scene Demo</title>
+  <style>
+  body {
+    margin: 0 auto;
+    padding: 0;
+    overflow: hidden;
+  }
+  body, html, canvas {
+    width:100%;
+    height:100%;
+  }
+  #render-target-container {
+    width: 100%;
+    height: 100%;
+  }
+  </style>
+</head>
+<body>
+  <div id="render-target-container"></div>
+  <script type="text/javascript" src="http://assets.verold.com/verold_api/verold_api_v1.0.4.js"></script>
+  <script type="text/javascript" src="http://assets.verold.com/verold_api/lib/OrbitControls.js"></script>
+  <script type="text/javascript" src="./cannon_app.js"></script>
+  <script type="text/javascript">
+var TestApp = VAPI.CannonApp.extend({
+    initialize: function() {
+      this.listenTo(this, 'cannon:pre_init', this.preInit);
+    },
+
+    preInit: function(scene) {
+      scene.entityModel.set('payload.userData.gravityX', 0);
+      scene.entityModel.set('payload.userData.gravityY', -9.82);
+      scene.entityModel.set('payload.userData.gravityZ', 0);
+
+      scene.traverse(function(obj) {
+        if (obj instanceof ModelObject) {
+          obj.entityModel.set('payload.userData.mass', 0);
+        }
+      });
+    },
+
+    defaultSceneLoaded: function (scene) {
+        var models = scene.getAllObjects({ 'filter': { 'model': true } }),
+            lookAt;
+
+        this.model = models[Object.keys(models)[0]];
+
+        this.camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 10000);
+        this.camera.up.set(0, 1, 0);
+        this.camera.position.set(0, 0.5, 2);
+
+        lookAt = new THREE.Vector3();
+        lookAt.add(this.model.threeData.center);
+        lookAt.multiply(this.model.threeData.scale);
+        lookAt.applyQuaternion(this.model.threeData.quaternion);
+        lookAt.add(this.model.threeData.position);
+
+        this.camera.lookAt(lookAt);
+
+        this.veroldEngine.setActiveCamera(this.camera);
+
+        this.controls = new THREE.OrbitControls(this.camera, this.getRenderer().domElement);
+
+    },
+
+    update: function(delta) {
+      this.controls.update();
+    }
+});
+
+var testApp = new TestApp({
+    el: '#render-target-container',
+    projectId: '51953ec94253930200000539',
+    engineOptions: {
+        inputSettings: {
+            enable: false
+        }
+    }
+});
+
+testApp.run();
+
+  </script>
+</body>
+</html>
+
+
+
+

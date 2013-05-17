@@ -31,9 +31,15 @@ define([ 'underscore' ], function(_) {
     this.world = world;
     this.model = model;
 
-    this.mass = opts.mass || this.mass || 1;
+    this.mass = 1;
     this.linearDamping = opts.linearDamping || this.linearDamping || 0.9;
     this.angularDamping = opts.angularDamping || this.angularDamping || 0.9;
+
+    if (opts.mass) {
+      this.mass = opts.mass;
+    } else if (model.entityModel.has('payload.userData.mass')) {
+      this.mass =  model.entityModel.get('payload.userData.mass');
+    }
 
     this.create();
   }

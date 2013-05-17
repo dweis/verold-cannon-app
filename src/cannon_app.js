@@ -41,7 +41,9 @@ define([ 'underscore', 'compound_mesh', 'cannon' ],
         success_hierarchy: function(scene) {
           that.defaultScene = scene;
 
-          that.initializeCannon();
+          that.trigger('cannon:pre_init', scene);
+          that.initializeCannon(scene);
+          that.trigger('cannon:post_init', scene);
           that.defaultSceneLoaded(scene);
 
           that.veroldEngine.on('update', that.update, that);
@@ -54,15 +56,31 @@ define([ 'underscore', 'compound_mesh', 'cannon' ],
       });
     },
 
-    initializeCannon: function() {
+    initializeCannon: function(scene) {
       var that = this,
           groundBody,
-          groundShape;
+          groundShape,
+          gravityX = 0,
+          gravityY = -9.82,
+          gravityZ = 0;
+
+      if (scene.entityModel.has('payload.userData.gravityX')) {
+        gravityX = scene.entityModel.get('payload.userData.gravityX');
+      }
+
+      if (scene.entityModel.has('payload.userData.gravityY')) {
+        gravityY = scene.entityModel.get('payload.userData.gravityY');
+      }
+
+      if (scene.entityModel.has('payload.userData.gravityZ')) {
+        gravityZ = scene.entityModel.get('payload.userData.gravityZ');
+      }
+
+      this.world = new CANNON.World();
+      this.world.gravity.set(gravityX, gravityY, gravityZ);
+      this.world.broadphase = new CANNON.NaiveBroadphase();
 
       // TODO: make this stuff configurable
-      this.world = new CANNON.World();
-      this.world.gravity.set(0, -9.82, 0);
-      this.world.broadphase = new CANNON.NaiveBroadphase();
       this.world.solver.iterations = 7;
       this.world.solver.tolerance = 0.1;
       this.world.defaultContactMaterial.contactEquationStiffness = 1e9;
